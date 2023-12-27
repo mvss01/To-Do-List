@@ -1,10 +1,12 @@
-import { useState, React } from 'react';
+import React, { useState } from 'react';
+import { MdDelete } from 'react-icons/md';
 import './App.css';
 
 const App = () => {
     const ESCAPE_KEY = 27;
     const ENTER_KEY = 13;
 
+    const [todos, setTodos] = useState([]);
     const [value, setValue] = useState();
 
     const erase = () => {
@@ -12,7 +14,10 @@ const App = () => {
     };
 
     const submit = () => {
-        console.log('submit', value);
+        setTodos([
+            ...todos,
+            { id: new Date().getTime(), title: value, checked: false },
+        ]);
         erase();
     };
 
@@ -27,6 +32,19 @@ const App = () => {
             erase();
         }
     };
+
+    const onToggle = (todo) => {
+        setTodos(
+            todos.map((obj) =>
+                obj.id === todo.id ? { ...obj, checked: !todo.checked } : obj
+            )
+        );
+    };
+
+    const onRemove = (todo) => {
+        setTodos(todos.filter((obj) => obj.id !== todo.id));
+    };
+
     return (
         <section id="app" className="container">
             <header>
@@ -40,6 +58,32 @@ const App = () => {
                     onChange={onChange}
                     onKeyDown={onKeyDown}
                 />
+                <ul className="todo-list">
+                    {todos.map((todo) => (
+                        <li key={todo.id.toString()}>
+                            <span
+                                className={[
+                                    'todo',
+                                    todo.checked ? 'checked' : '',
+                                ].join(' ')}
+                                onClick={() => onToggle(todo)}
+                                onKeyDown={() => onToggle(todo)}
+                                role="button"
+                                tabIndex="0"
+                            >
+                                {todo.title}
+                            </span>
+                            <button
+                                className="remove"
+                                type="button"
+                                aria-label="Excluir"
+                                onClick={() => onRemove(todo)}
+                            >
+                                <MdDelete size={28} />
+                            </button>
+                        </li>
+                    ))}
+                </ul>
             </section>
         </section>
     );
